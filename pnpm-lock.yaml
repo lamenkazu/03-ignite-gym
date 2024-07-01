@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@expo-google-fonts/roboto':
+        specifier: ^0.2.3
+        version: 0.2.3
       expo:
         specifier: ~51.0.17
         version: 51.0.17(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))
+      expo-font:
+        specifier: ~12.0.7
+        version: 12.0.7(expo@51.0.17(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7)))
       expo-status-bar:
         specifier: ~1.12.1
         version: 1.12.1
@@ -794,6 +800,9 @@ packages:
   '@babel/types@7.24.7':
     resolution: {integrity: sha512-XEFXSlxiG5td2EJRe8vOmRbaXVgfcBlszKujvVmWIK/UpywWljQCfzAv3RQCGujWQ1RD4YYWEAqDXfuJiy8f5Q==}
     engines: {node: '>=6.9.0'}
+
+  '@expo-google-fonts/roboto@0.2.3':
+    resolution: {integrity: sha512-PF6S//ZYWeXfpYTwvY2oEe0d5RnqwR5KMsGjuTgg6y9p/CPK/IkWL+wsbkzjfd+Jck1Q1pRlWOoe5uz42sQFRg==}
 
   '@expo/bunyan@4.0.0':
     resolution: {integrity: sha512-Ydf4LidRB/EBI+YrB+cVLqIseiRfjUI/AeHBgjGMtq3GroraDu81OV7zqophRgupngoL3iS3JUMDMnxO7g39qA==}
@@ -4815,6 +4824,8 @@ snapshots:
       '@babel/helper-string-parser': 7.24.7
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
+
+  '@expo-google-fonts/roboto@0.2.3': {}
 
   '@expo/bunyan@4.0.0':
     dependencies:
