@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { StatusBar, Text, View } from "react-native";
 import {
   useFonts,
   Roboto_400Regular,
@@ -13,6 +13,11 @@ export default function App() {
 
   return (
     <View>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       {fontsLoaded ? (
         <Text>Hello Ignite Gym</Text>
       ) : (
