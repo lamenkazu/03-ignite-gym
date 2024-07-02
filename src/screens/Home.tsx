@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export const Home = () => {
   const [groups, setGroups] = useState([
-    "costa",
+    "costas",
     "ombro",
     "tricepes",
     "bícepes",
@@ -31,7 +31,9 @@ export const Home = () => {
         renderItem={({ item }) => (
           <Group
             name={item}
-            isActive={selectedGroup === item}
+            isActive={
+              selectedGroup.toLocaleUpperCase() === item.toLocaleUpperCase()
+            }
             onPress={() => setSelectedGroup(item)}
           />
         )}
