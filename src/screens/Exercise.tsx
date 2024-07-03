@@ -5,6 +5,7 @@ import {
   HStack,
   Icon,
   Image,
+  ScrollView,
   Text,
   VStack,
 } from "native-base";
@@ -52,44 +53,46 @@ export const Exercise = () => {
         </HStack>
       </VStack>
 
-      <VStack p={8}>
-        <Image
-          source={{
-            uri: "https://www.origym.com.br/banners/remada-unilateral.png",
-          }}
-          alt="Nome do exercício"
-          w="full"
-          h={80}
-          mb={3}
-          rounded="lg"
-          resizeMode="cover"
-        />
+      <ScrollView>
+        <VStack p={8}>
+          <Image
+            source={{
+              uri: "https://www.origym.com.br/banners/remada-unilateral.png",
+            }}
+            alt="Nome do exercício"
+            w="full"
+            h={80}
+            mb={3}
+            rounded="lg"
+            resizeMode="cover"
+          />
 
-        <Box bg="gray.600" rounded="md" pb={4} px={4}>
-          <HStack
-            alignItems="center"
-            justifyContent="space-around"
-            mb={6}
-            mt={5}
-          >
-            <HStack>
-              <SeriesSvg />
-              <Text color="gray.200" ml="2">
-                3 séries
-              </Text>
+          <Box bg="gray.600" rounded="md" pb={4} px={4}>
+            <HStack
+              alignItems="center"
+              justifyContent="space-around"
+              mb={6}
+              mt={5}
+            >
+              <HStack>
+                <SeriesSvg />
+                <Text color="gray.200" ml="2">
+                  3 séries
+                </Text>
+              </HStack>
+
+              <HStack>
+                <RepetitionsSvg />
+                <Text color="gray.200" ml="2">
+                  12 repetições
+                </Text>
+              </HStack>
             </HStack>
 
-            <HStack>
-              <RepetitionsSvg />
-              <Text color="gray.200" ml="2">
-                12 repetições
-              </Text>
-            </HStack>
-          </HStack>
-
-          <Button title="Marcar como realizado" />
-        </Box>
-      </VStack>
+            <Button title="Marcar como realizado" />
+          </Box>
+        </VStack>
+      </ScrollView>
     </VStack>
   );
 };
