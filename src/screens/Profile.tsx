@@ -23,18 +23,27 @@ export const Profile = () => {
   const [userPhoto, setUserPhoto] = useState("");
 
   const handleUserPhotoSelect = async () => {
-    const selectedPhoto = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // tipo de conteudo que quer selecionar da galeria do usuario
-      quality: 1, // qualidade da imagem vai de 0 a 1
-      aspect: [4, 4], // Aspecto da imagem. No caso, 4 por 4 é uma imagem quadrada, poderia ser 3/4 e dai em diante.
-      allowsEditing: true, // Permite o usuário editar a imagem após selecionar ela.
-    });
+    setIsPhotoLoading(true);
+    try {
+      const selectedPhoto = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // tipo de conteudo que quer selecionar da galeria do usuario
+        quality: 1, // qualidade da imagem vai de 0 a 1
+        aspect: [4, 4], // Aspecto da imagem. No caso, 4 por 4 é uma imagem quadrada, poderia ser 3/4 e dai em diante.
+        allowsEditing: true, // Permite o usuário editar a imagem após selecionar ela.
+      });
 
-    if (selectedPhoto.canceled) {
-      return; //Se o usuario cancelar a seleção de foto, nada deve ser feito.
+      if (selectedPhoto.canceled) {
+        return; //Se o usuario cancelar a seleção de foto, nada deve ser feito.
+      }
+
+      if (selectedPhoto.assets[0].uri) {
+        setUserPhoto(selectedPhoto.assets[0].uri);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsPhotoLoading(false);
     }
-
-    setUserPhoto(selectedPhoto.assets[0].uri);
   };
 
   return (
