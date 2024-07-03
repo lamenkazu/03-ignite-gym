@@ -6,6 +6,7 @@ import {
   ScrollView,
   Skeleton,
   Text,
+  useToast,
   VStack,
 } from "native-base";
 
@@ -20,7 +21,11 @@ const PHOTO_SIZE = 33;
 
 export const Profile = () => {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
-  const [userPhoto, setUserPhoto] = useState("");
+  const [userPhoto, setUserPhoto] = useState(
+    "https://github.com/lamenkazu.png"
+  );
+
+  const toast = useToast();
 
   const handleUserPhotoSelect = async () => {
     setIsPhotoLoading(true);
@@ -43,7 +48,12 @@ export const Profile = () => {
         console.log(fileSizeInMb);
 
         if (fileSizeInMb > 5) {
-          return Alert.alert("Imagem muito grande!", "Ecolha uma de até 5MB");
+          return toast.show({
+            title: "Imagem muito grande! Ecolha uma de até 5MB",
+            placement: "top",
+            marginTop: "40",
+            bgColor: "red.500",
+          });
         }
 
         setUserPhoto(selectedPhoto.assets[0].uri);
