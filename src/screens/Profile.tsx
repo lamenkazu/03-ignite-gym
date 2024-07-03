@@ -22,7 +22,12 @@ export const Profile = () => {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
 
   const handleUserPhotoSelect = async () => {
-    await ImagePicker.launchImageLibraryAsync();
+    await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // tipo de conteudo que quer selecionar da galeria do usuario
+      quality: 1, // qualidade da imagem vai de 0 a 1
+      aspect: [4, 4], // Aspecto da imagem. No caso, 4 por 4 é uma imagem quadrada, poderia ser 3/4 e dai em diante.
+      allowsEditing: true, // Permite o usuário editar a imagem após selecionar ela.
+    });
   };
 
   return (
