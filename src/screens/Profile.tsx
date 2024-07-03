@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import {
   Center,
   Heading,
@@ -36,7 +36,16 @@ export const Profile = () => {
         return; //Se o usuario cancelar a seleção de foto, nada deve ser feito.
       }
 
-      if (selectedPhoto.assets[0].uri) {
+      const { fileSize, uri } = selectedPhoto.assets[0];
+
+      if (uri && fileSize) {
+        const fileSizeInMb = fileSize / 1024 / 1024;
+        console.log(fileSizeInMb);
+
+        if (fileSizeInMb > 5) {
+          return Alert.alert("Imagem muito grande!", "Ecolha uma de até 5MB");
+        }
+
         setUserPhoto(selectedPhoto.assets[0].uri);
       }
     } catch (error) {
