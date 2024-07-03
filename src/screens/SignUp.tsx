@@ -20,14 +20,15 @@ export const SignUp = () => {
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
     >
+      <Image
+        source={BackgroundImg}
+        defaultSource={BackgroundImg}
+        alt="Pessoas treinando"
+        resizeMode="stretch"
+        position={"absolute"}
+      />
+
       <VStack flex={1} px={10}>
-        <Image
-          source={BackgroundImg}
-          defaultSource={BackgroundImg}
-          alt="Pessoas treinando"
-          resizeMode="stretch"
-          position={"absolute"}
-        />
         <Center my={24}>
           <Logo />
 
