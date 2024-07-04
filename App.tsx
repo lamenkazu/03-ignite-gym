@@ -10,6 +10,7 @@ import { Routes } from "@/routes";
 
 import { THEME } from "@/theme";
 import { Loading } from "@/components/Loading";
+import { AuthContext } from "@/context/AuthContext";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,7 +25,23 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <Routes /> : <Loading />}
+
+      {fontsLoaded ? (
+        <AuthContext.Provider
+          value={{
+            user: {
+              id: "0",
+              name: "Erick",
+              email: "erick@mail.com",
+              avatar: "erick.png",
+            },
+          }}
+        >
+          <Routes />
+        </AuthContext.Provider>
+      ) : (
+        <Loading />
+      )}
     </NativeBaseProvider>
   );
 }
