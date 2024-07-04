@@ -8,6 +8,7 @@ interface AuthContextProviderProps {
 
 export interface AuthContextDataProps {
   user: UserDTO;
+  signIn: (email: string, password: string) => void;
 }
 
 const AuthContext = createContext<AuthContextDataProps>(
@@ -16,15 +17,26 @@ const AuthContext = createContext<AuthContextDataProps>(
 
 const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState({
-    user: {
-      id: "0",
-      name: "Erick",
-      email: "erick@mail.com",
-      avatar: "erick.png",
-    },
+    id: "0",
+    name: "Erick",
+    email: "erick@mail.com",
+    avatar: "erick.png",
   });
 
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  const signIn = (email: string, password: string) => {
+    setUser({
+      id: "",
+      name: "",
+      email,
+      avatar: "",
+    });
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, signIn }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export { AuthContext, AuthContextProvider };

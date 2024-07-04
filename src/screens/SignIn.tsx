@@ -10,6 +10,7 @@ import BackgroundImg from "@/assets/background.png";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { AuthNavigatorAuthProps } from "@/routes/auth.routes";
+import { useAuth } from "@/hooks/useAuth";
 
 const signInSchema = z.object({
   email: z.string().min(1, "Informe o e-mail").email("E-mail inválido."),
@@ -22,6 +23,7 @@ type SignInSchema = z.infer<typeof signInSchema>;
 
 export const SignIn = () => {
   const { navigate } = useNavigation<AuthNavigatorAuthProps>();
+  const { signIn } = useAuth();
 
   const {
     control,
@@ -39,8 +41,8 @@ export const SignIn = () => {
     navigate("signUp");
   };
 
-  const handleSignIn = (data: SignInSchema) => {
-    console.log(data);
+  const handleSignIn = ({ email, password }: SignInSchema) => {
+    signIn(email, password);
   };
 
   return (
