@@ -3,7 +3,9 @@ import { Center, Heading, Image, ScrollView, Text, VStack } from "native-base";
 import { Controller, useForm } from "react-hook-form";
 
 import { z } from "zod";
+import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "@/lib/axios";
 
 import Logo from "@/assets/logo.svg";
 import BackgroundImg from "@/assets/background.png";
@@ -11,7 +13,6 @@ import BackgroundImg from "@/assets/background.png";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { AuthNavigatorAuthProps } from "@/routes/auth.routes";
-import { api } from "@/lib/axios";
 
 const signUpSchema = z
   .object({
@@ -43,8 +44,15 @@ export const SignUp = () => {
   };
 
   const handleSignUp = async ({ name, email, password }: SignUpSchema) => {
-    const response = await api.post("/users", { name, email, password });
-    console.log(response.data);
+    try {
+      const response = await api.post("/users", { name, email, password });
+
+      console.log(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data.message);
+      }
+    }
   };
 
   const {
