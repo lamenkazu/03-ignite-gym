@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useState } from "react";
 
 import { UserDTO } from "@/dtos/UserDTO";
+import { api } from "@/lib/axios";
 
 interface AuthContextProviderProps {
   children: ReactNode;
@@ -8,7 +9,7 @@ interface AuthContextProviderProps {
 
 export interface AuthContextDataProps {
   user: UserDTO;
-  signIn: (email: string, password: string) => void;
+  signIn: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextDataProps>(
@@ -16,20 +17,18 @@ const AuthContext = createContext<AuthContextDataProps>(
 );
 
 const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
-  const [user, setUser] = useState({
-    id: "0",
-    name: "Erick",
-    email: "erick@mail.com",
-    avatar: "erick.png",
-  });
+  const [user, setUser] = useState<UserDTO>({} as UserDTO);
 
-  const signIn = (email: string, password: string) => {
-    setUser({
-      id: "",
-      name: "",
-      email,
-      avatar: "",
-    });
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { data } = await api.post("/sessions", { email, password });
+
+      if (data.user) {
+        setUser(data.user);
+      }
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (

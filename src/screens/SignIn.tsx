@@ -41,8 +41,8 @@ export const SignIn = () => {
     navigate("signUp");
   };
 
-  const handleSignIn = ({ email, password }: SignInSchema) => {
-    signIn(email, password);
+  const handleSignIn = async ({ email, password }: SignInSchema) => {
+    await signIn(email, password);
   };
 
   return (
