@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Center,
@@ -7,24 +8,76 @@ import {
   Image,
   ScrollView,
   Text,
+  useToast,
   VStack,
 } from "native-base";
 import { TouchableOpacity } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import { AppNavigationRoutesProp } from "@/routes/app.routes";
-import { Button } from "@/components/Button";
+import { AppError } from "utils/AppError";
+import { api } from "@/lib/axios";
 
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
+import { Button } from "@/components/Button";
+import { Loading } from "@/components/Loading";
+
+import { Feather } from "@expo/vector-icons";
 import BodySvg from "@/assets/body.svg";
 import SeriesSvg from "@/assets/series.svg";
 import RepetitionsSvg from "@/assets/repetitions.svg";
+import { ExerciseDTO } from "@/dtos/ExerciseDTO";
+
+interface RouteParams {
+  id: string;
+}
 
 export const Exercise = () => {
+  const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO);
+
   const { goBack } = useNavigation<AppNavigationRoutesProp>();
   const handleGoBack = () => {
     goBack();
   };
+
+  const { params } = useRoute();
+  const { id } = params as RouteParams;
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchExerciseDetails = async () => {
+        setIsLoading(true);
+        try {
+          const response = await api.get(`/exercises/${id}`);
+          setExercise(response.data);
+        } catch (error) {
+          const isAppError = error instanceof AppError;
+          const title = isAppError
+            ? error.message
+            : "Não foi possível carregar os grupos musculares.";
+
+          toast.show({
+            title,
+            placement: "bottom",
+            bgColor: "red.500",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchExerciseDetails();
+    }, [id])
+  );
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <VStack flex={1}>
@@ -40,14 +93,14 @@ export const Exercise = () => {
           alignItems="center"
         >
           <Heading color="gray.100" fontSize="lg" flexShrink={1}>
-            Puxada frontal
+            {exercise.name}
           </Heading>
 
           <HStack alignItems="center">
             <BodySvg />
 
             <Text color="gray.200" ml={1} textTransform="capitalize">
-              Costas
+              {exercise.group}
             </Text>
           </HStack>
         </HStack>
@@ -55,17 +108,18 @@ export const Exercise = () => {
 
       <ScrollView>
         <VStack p={8}>
-          <Image
-            source={{
-              uri: "https://www.origym.com.br/banners/remada-unilateral.png",
-            }}
-            alt="Nome do exercício"
-            w="full"
-            h={80}
-            mb={3}
-            rounded="lg"
-            resizeMode="cover"
-          />
+          <Box rounded={"lg"} mb={3} overflow={"hidden"}>
+            <Image
+              source={{
+                uri: `${api.defaults.baseURL}/exercise/demo/${exercise.demo}`,
+              }}
+              alt="Nome do exercício"
+              w="full"
+              h={80}
+              rounded="lg"
+              resizeMode="cover"
+            />
+          </Box>
 
           <Box bg="gray.600" rounded="md" pb={4} px={4}>
             <HStack
@@ -77,14 +131,14 @@ export const Exercise = () => {
               <HStack>
                 <SeriesSvg />
                 <Text color="gray.200" ml="2">
-                  3 séries
+                  {exercise.series} séries
                 </Text>
               </HStack>
 
               <HStack>
                 <RepetitionsSvg />
                 <Text color="gray.200" ml="2">
-                  12 repetições
+                  {exercise.repetitions} repetições
                 </Text>
               </HStack>
             </HStack>
