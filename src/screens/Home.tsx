@@ -118,8 +118,8 @@ export const Home = () => {
         <FlatList
           data={exercises}
           keyExtractor={(item) => item.id}
-          renderItem={() => (
-            <ExerciseCard onPress={handleOpenExerciseDetails} />
+          renderItem={({ item }) => (
+            <ExerciseCard onPress={handleOpenExerciseDetails} data={item} />
           )}
           showsVerticalScrollIndicator={false}
           _contentContainerStyle={{ pb: 20 }}
