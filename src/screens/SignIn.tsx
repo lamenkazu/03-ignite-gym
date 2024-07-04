@@ -131,7 +131,7 @@ export const SignIn = () => {
           <Button
             title="Acessar"
             onPress={handleSubmit(handleSignIn)}
-            disabled={isSubmitting}
+            isLoading={isSubmitting}
           />
         </Center>
 
