@@ -11,13 +11,7 @@ import BackgroundImg from "@/assets/background.png";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { AuthNavigatorAuthProps } from "@/routes/auth.routes";
-
-interface FormDataProps {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { api } from "@/lib/axios";
 
 const signUpSchema = z
   .object({
@@ -48,8 +42,9 @@ export const SignUp = () => {
     goBack();
   };
 
-  const handleSignUp = (data: SignUpSchema) => {
-    console.log(data);
+  const handleSignUp = async ({ name, email, password }: SignUpSchema) => {
+    const response = await api.post("/users", { name, email, password });
+    console.log(response.data);
   };
 
   const {
