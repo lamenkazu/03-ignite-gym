@@ -22,6 +22,7 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { AuthNavigatorAuthProps } from "@/routes/auth.routes";
 import { AppError } from "utils/AppError";
+import { useAuth } from "@/hooks/useAuth";
 
 const signUpSchema = z
   .object({
@@ -47,18 +48,18 @@ type SignUpSchema = z.infer<typeof signUpSchema>;
 
 export const SignUp = () => {
   const { goBack } = useNavigation<AuthNavigatorAuthProps>();
+  const toast = useToast();
+  const { signIn } = useAuth();
 
   const handleBackToLogin = () => {
     goBack();
   };
 
-  const toast = useToast();
-
   const handleSignUp = async ({ name, email, password }: SignUpSchema) => {
     try {
-      const response = await api.post("/users", { name, email, password });
+      await api.post("/users", { name, email, password }); // cria usuario
 
-      console.log(response.data);
+      await signIn(email, password); // loga o usuario após criado.
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -75,7 +76,7 @@ export const SignUp = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -179,6 +180,7 @@ export const SignUp = () => {
           <Button
             title="Criar e acessar"
             onPress={handleSubmit(handleSignUp)}
+            isLoading={isSubmitting}
           />
         </Center>
 
