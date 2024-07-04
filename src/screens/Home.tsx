@@ -17,11 +17,12 @@ import { Group } from "@/components/Group";
 import { HomeHeader } from "@/components/HomeHeader";
 import { AppError } from "utils/AppError";
 import { api } from "@/lib/axios";
+import { ExerciseDTO } from "@/dtos/ExerciseDTO";
 
 export const Home = () => {
   const toast = useToast();
   const [groups, setGroups] = useState<string[]>([]);
-  const [exercises, setExercises] = useState([]);
+  const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
   const [selectedGroup, setSelectedGroup] = useState("costas");
 
   const { navigate } = useNavigation<AppNavigationRoutesProp>();
@@ -116,7 +117,7 @@ export const Home = () => {
 
         <FlatList
           data={exercises}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item.id}
           renderItem={() => (
             <ExerciseCard onPress={handleOpenExerciseDetails} />
           )}
