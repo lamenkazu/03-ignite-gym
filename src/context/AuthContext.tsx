@@ -4,6 +4,12 @@ import { UserDTO } from "@/dtos/UserDTO";
 import { api } from "@/lib/axios";
 import { getUser, removeUser, saveUser } from "@/storage/user";
 import { boolean } from "zod";
+import { saveAuthToken } from "@/storage/authToken";
+
+interface AuthTokenStorageProps {
+  userData: UserDTO;
+  token: string;
+}
 
 interface AuthContextProviderProps {
   children: ReactNode;
@@ -39,13 +45,34 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
+  const storageUserAndToken = async ({
+    userData,
+    token,
+  }: AuthTokenStorageProps) => {
+    setIsUserStorageDataLoading(true);
+
+    try {
+      await saveUser(userData); // Salva o usuário no Async Storage para armazenamento da informação.
+      await saveAuthToken(token); // Salva o token do usuário no Async Storage.
+
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      setUser(user); // Atualiza estado do usuario para ser usado na aplicação.
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsUserStorageDataLoading(false);
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
     try {
       const { data } = await api.post("/sessions", { email, password });
-
-      if (data.user) {
-        setUser(data.user);
-        saveUser(data.user);
+      if (data.user && data.token) {
+        storageUserAndToken({
+          userData: user,
+          token: data.token,
+        });
       }
     } catch (error) {
       throw error;
