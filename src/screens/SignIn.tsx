@@ -1,5 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
-import { Center, Heading, Image, ScrollView, Text, VStack } from "native-base";
+import {
+  Center,
+  Heading,
+  Image,
+  ScrollView,
+  Text,
+  useToast,
+  VStack,
+} from "native-base";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +19,7 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { AuthNavigatorAuthProps } from "@/routes/auth.routes";
 import { useAuth } from "@/hooks/useAuth";
+import { AppError } from "utils/AppError";
 
 const signInSchema = z.object({
   email: z.string().min(1, "Informe o e-mail").email("E-mail inválido."),
@@ -22,8 +31,9 @@ const signInSchema = z.object({
 type SignInSchema = z.infer<typeof signInSchema>;
 
 export const SignIn = () => {
-  const { navigate } = useNavigation<AuthNavigatorAuthProps>();
   const { signIn } = useAuth();
+  const { navigate } = useNavigation<AuthNavigatorAuthProps>();
+  const toast = useToast();
 
   const {
     control,
@@ -42,7 +52,19 @@ export const SignIn = () => {
   };
 
   const handleSignIn = async ({ email, password }: SignInSchema) => {
-    await signIn(email, password);
+    try {
+      await signIn(email, password);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível conectar. Tente novamente.";
+
+      toast.show({
+        title,
+        bgColor: "red.500",
+      });
+    }
   };
 
   return (
