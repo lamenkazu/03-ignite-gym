@@ -42,7 +42,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       const userData = await getUser();
       const token = await getAuthToken();
 
-      if (user && token) {
+      if (userData && token) {
         userAndTokenUpdate({ userData, token });
       }
     } catch (error) {
@@ -52,10 +52,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
-  const userAndTokenUpdate = async ({
-    userData,
-    token,
-  }: AuthTokenStorageProps) => {
+  const userAndTokenUpdate = ({ userData, token }: AuthTokenStorageProps) => {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
     setUser(userData); // Atualiza estado do usuario para ser usado na aplicação.
@@ -85,7 +82,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
       if (data.user && data.token) {
         await userAndTokenSave({
-          userData: user,
+          userData: data.user,
           token: data.token,
         });
         userAndTokenUpdate({

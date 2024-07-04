@@ -8,9 +8,7 @@ export const saveAuthToken = async (token: string) => {
 export const getAuthToken = async () => {
   const token = await AsyncStorage.getItem(AUTH_TOKEN_STORAGE);
 
-  if (token) {
-    return token;
-  }
+  return token;
 };
 
 export const removeAuthToken = async () => {
