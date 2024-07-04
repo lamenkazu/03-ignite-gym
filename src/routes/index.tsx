@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { AuthRoutes } from "./auth.routes";
 import { AppRoutes } from "./app.routes";
+import { Loading } from "@/components/Loading";
 
 export const Routes = () => {
   const { colors } = useTheme();
@@ -12,8 +13,11 @@ export const Routes = () => {
   const theme = DefaultTheme;
   theme.colors.background = colors.gray[700];
 
-  const { user } = useAuth();
-  console.log(user.id);
+  const { user, isUserStorageDataLoading } = useAuth();
+
+  if (isUserStorageDataLoading) {
+    return <Loading />;
+  }
 
   return (
     <Box flex={1} bg={"gray.700"}>

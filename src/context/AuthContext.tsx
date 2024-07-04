@@ -1,7 +1,9 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 import { UserDTO } from "@/dtos/UserDTO";
 import { api } from "@/lib/axios";
+import { getUser, saveUser } from "@/storage/user";
+import { boolean } from "zod";
 
 interface AuthContextProviderProps {
   children: ReactNode;
@@ -10,6 +12,7 @@ interface AuthContextProviderProps {
 export interface AuthContextDataProps {
   user: UserDTO;
   signIn: (email: string, password: string) => Promise<void>;
+  isUserStorageDataLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextDataProps>(
@@ -18,6 +21,22 @@ const AuthContext = createContext<AuthContextDataProps>(
 
 const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState<UserDTO>({} as UserDTO);
+  const [isUserStorageDataLoading, setIsUserStorageDataLoading] =
+    useState(true);
+
+  const loadUserData = async () => {
+    try {
+      const user = await getUser();
+
+      if (user) {
+        setUser(user);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsUserStorageDataLoading(false);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -25,14 +44,19 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
       if (data.user) {
         setUser(data.user);
+        saveUser(data.user);
       }
     } catch (error) {
       throw error;
     }
   };
 
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, signIn }}>
+    <AuthContext.Provider value={{ user, signIn, isUserStorageDataLoading }}>
       {children}
     </AuthContext.Provider>
   );
