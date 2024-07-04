@@ -1,10 +1,14 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 
-import { UserDTO } from "@/dtos/UserDTO";
 import { api } from "@/lib/axios";
+
+import { UserDTO } from "@/dtos/UserDTO";
 import { getUser, removeUser, saveUser } from "@/storage/user";
-import { boolean } from "zod";
-import { saveAuthToken } from "@/storage/authToken";
+import {
+  getAuthToken,
+  removeAuthToken,
+  saveAuthToken,
+} from "@/storage/authToken";
 
 interface AuthTokenStorageProps {
   userData: UserDTO;
@@ -32,11 +36,14 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     useState(true);
 
   const loadUserData = async () => {
-    try {
-      const user = await getUser();
+    setIsUserStorageDataLoading(true);
 
-      if (user) {
-        setUser(user);
+    try {
+      const userData = await getUser();
+      const token = await getAuthToken();
+
+      if (user && token) {
+        userAndTokenUpdate({ userData, token });
       }
     } catch (error) {
       throw error;
@@ -45,7 +52,16 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
-  const storageUserAndToken = async ({
+  const userAndTokenUpdate = async ({
+    userData,
+    token,
+  }: AuthTokenStorageProps) => {
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    setUser(userData); // Atualiza estado do usuario para ser usado na aplicação.
+  };
+
+  const userAndTokenSave = async ({
     userData,
     token,
   }: AuthTokenStorageProps) => {
@@ -54,10 +70,6 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     try {
       await saveUser(userData); // Salva o usuário no Async Storage para armazenamento da informação.
       await saveAuthToken(token); // Salva o token do usuário no Async Storage.
-
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      setUser(user); // Atualiza estado do usuario para ser usado na aplicação.
     } catch (error) {
       throw error;
     } finally {
@@ -66,11 +78,18 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   };
 
   const signIn = async (email: string, password: string) => {
+    setIsUserStorageDataLoading(true);
+
     try {
       const { data } = await api.post("/sessions", { email, password });
+
       if (data.user && data.token) {
-        storageUserAndToken({
+        await userAndTokenSave({
           userData: user,
+          token: data.token,
+        });
+        userAndTokenUpdate({
+          userData: data.user,
           token: data.token,
         });
       }
@@ -80,10 +99,13 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   };
 
   const signOut = async () => {
+    setIsUserStorageDataLoading(true);
+
     try {
-      setIsUserStorageDataLoading(true);
-      setUser({} as UserDTO);
       await removeUser();
+      await removeAuthToken();
+
+      setUser({} as UserDTO);
     } catch (error) {
       throw error;
     } finally {
