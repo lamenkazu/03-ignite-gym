@@ -57,6 +57,7 @@ export const Exercise = () => {
       toast.show({
         title: "Parabéns! Exercício registrado no seu histórico",
         placement: "bottom",
+        marginBottom: "5",
         bgColor: "green.700",
       });
 
@@ -70,6 +71,7 @@ export const Exercise = () => {
       toast.show({
         title,
         placement: "bottom",
+        marginBottom: "5",
         bgColor: "red.500",
       });
     } finally {
@@ -92,6 +94,7 @@ export const Exercise = () => {
         toast.show({
           title,
           placement: "bottom",
+          marginBottom: "5",
           bgColor: "red.500",
         });
       } finally {

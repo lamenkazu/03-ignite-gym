@@ -16,17 +16,69 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 
 import * as ImagePicker from "expo-image-picker";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { useAuth } from "@/hooks/useAuth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "@/lib/axios";
+import { AppError } from "utils/AppError";
 
 const PHOTO_SIZE = 33;
 
+const profileFormSchema = z
+  .object({
+    name: z.string().min(1, "Informe o nome."),
+    email: z.string(),
+    oldPassword: z
+      .string()
+      .optional()
+      .transform((value) => (value === "" ? undefined : value))
+      .refine(
+        (value) => value === undefined || value.length >= 6,
+        "A senha deve ter pelo menos 6 dígitos."
+      ),
+    password: z
+      .string()
+      .optional()
+      .transform((value) => (value === "" ? undefined : value))
+      .refine(
+        (value) => value === undefined || value.length >= 6,
+        "A senha deve ter pelo menos 6 dígitos."
+      ),
+    confirmPassword: z
+      .string()
+      .optional()
+      .transform((value) => (value === "" ? undefined : value))
+      .refine(
+        (value) => value === undefined || value.length >= 6,
+        "A senha deve ter pelo menos 6 dígitos."
+      ),
+  })
+  .superRefine((data, context) => {
+    if (data.password && data.confirmPassword && !data.oldPassword) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["oldPassword"],
+        message: "Deve inserir a senha antiga para alterar a senha.",
+      });
+    }
+    if (data.password !== data.confirmPassword) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirmPassword"],
+        message: "As senhas devem ser iguais",
+      });
+    }
+  });
+
+type ProfileFormSchema = z.infer<typeof profileFormSchema>;
+
 export const Profile = () => {
+  /**** Photo *****/
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState(
     "https://github.com/lamenkazu.png"
   );
-
-  const toast = useToast();
-
   const handleUserPhotoSelect = async () => {
     setIsPhotoLoading(true);
     try {
@@ -65,6 +117,55 @@ export const Profile = () => {
     }
   };
 
+  const toast = useToast();
+  const { user, updateUser } = useAuth();
+
+  /*** Form ***/
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ProfileFormSchema>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+  });
+
+  const handleUpdateProfile = async (data: ProfileFormSchema) => {
+    try {
+      await api.put("/users", {
+        name: data.name,
+        password: data.password,
+        old_password: data.oldPassword,
+      });
+
+      const updatedUser = user;
+      updatedUser.name = data.name;
+      await updateUser(updatedUser);
+
+      toast.show({
+        title: "Perfil atualizado com sucesso!",
+        placement: "bottom",
+        marginBottom: "5",
+        bgColor: "green.700",
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível atualizar os seus dados :(\nTente novamente mais tarde!";
+
+      toast.show({
+        title,
+        placement: "bottom",
+        marginBottom: "5",
+        bgColor: "red.500",
+      });
+    }
+  };
+
   return (
     <VStack flex={1}>
       <Header title="Perfil" />
@@ -99,9 +200,33 @@ export const Profile = () => {
             </Text>
           </TouchableOpacity>
 
-          <Input bg="gray.600" placeholder="Nome" />
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="Nome"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.name?.message}
+              />
+            )}
+          />
 
-          <Input bg="gray.600" placeholder="E-mail" isDisabled />
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="E-mail"
+                isDisabled
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
         </Center>
 
         <VStack px={10} mt={12} mb={9}>
@@ -109,17 +234,52 @@ export const Profile = () => {
             Alterar senha
           </Heading>
 
-          <Input bg="gray.600" placeholder="Senha antiga" secureTextEntry />
-
-          <Input bg="gray.600" placeholder="Nova senha" secureTextEntry />
-
-          <Input
-            bg="gray.600"
-            placeholder="Confirme a nova senha"
-            secureTextEntry
+          <Controller
+            control={control}
+            name="oldPassword"
+            render={({ field: { onChange } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="Senha antiga"
+                secureTextEntry
+                onChangeText={onChange}
+                errorMessage={errors.oldPassword?.message}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="Nova senha"
+                secureTextEntry
+                onChangeText={onChange}
+                errorMessage={errors.password?.message}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field: { onChange } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="Confirme a nova senha"
+                secureTextEntry
+                onChangeText={onChange}
+                errorMessage={errors.confirmPassword?.message}
+              />
+            )}
           />
 
-          <Button title="Atualizar" mt={4} />
+          <Button
+            title="Atualizar"
+            mt={4}
+            onPress={handleSubmit(handleUpdateProfile)}
+            isLoading={isSubmitting}
+          />
         </VStack>
       </ScrollView>
     </VStack>

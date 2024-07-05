@@ -37,6 +37,7 @@ export const History = () => {
           toast.show({
             title,
             placement: "bottom",
+            marginBottom: "5",
             bgColor: "red.500",
           });
         } finally {

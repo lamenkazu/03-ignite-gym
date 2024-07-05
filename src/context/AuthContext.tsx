@@ -23,6 +23,7 @@ export interface AuthContextDataProps {
   user: UserDTO;
   isUserStorageDataLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  updateUser: (updatedUser: UserDTO) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -95,6 +96,15 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
+  const updateUser = async (updatedUser: UserDTO) => {
+    try {
+      setUser(updatedUser);
+      await saveUser(updatedUser);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     setIsUserStorageDataLoading(true);
 
@@ -116,7 +126,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, signIn, signOut, isUserStorageDataLoading }}
+      value={{ user, signIn, updateUser, signOut, isUserStorageDataLoading }}
     >
       {children}
     </AuthContext.Provider>
