@@ -93,11 +93,10 @@ export const Profile = () => {
         return; //Se o usuario cancelar a seleção de foto, nada deve ser feito.
       }
 
-      const { fileSize, uri } = selectedPhoto.assets[0];
+      const { fileSize, uri, fileName } = selectedPhoto.assets[0];
 
       if (uri && fileSize) {
         const fileSizeInMb = fileSize / 1024 / 1024;
-        console.log(fileSizeInMb);
 
         if (fileSizeInMb > 5) {
           return toast.show({
@@ -108,7 +107,19 @@ export const Profile = () => {
           });
         }
 
-        setUserPhoto(selectedPhoto.assets[0].uri);
+        const fileExtension = selectedPhoto.assets[0].mimeType
+          ?.split("/")
+          .pop();
+
+        const photoFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: selectedPhoto.assets[0].uri,
+          type: selectedPhoto.assets[0].mimeType,
+        };
+
+        console.log(photoFile);
+
+        // setUserPhoto(selectedPhoto.assets[0].uri);
       }
     } catch (error) {
       console.log(error);
