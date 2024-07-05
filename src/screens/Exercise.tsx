@@ -38,9 +38,10 @@ interface RouteParams {
 export const Exercise = () => {
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO);
 
-  const { goBack } = useNavigation<AppNavigationRoutesProp>();
+  const { goBack, navigate } = useNavigation<AppNavigationRoutesProp>();
   const handleGoBack = () => {
     goBack();
   };
@@ -48,32 +49,58 @@ export const Exercise = () => {
   const { params } = useRoute();
   const { id } = params as RouteParams;
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchExerciseDetails = async () => {
-        setIsLoading(true);
-        try {
-          const response = await api.get(`/exercises/${id}`);
-          setExercise(response.data);
-        } catch (error) {
-          const isAppError = error instanceof AppError;
-          const title = isAppError
-            ? error.message
-            : "Não foi possível carregar os grupos musculares.";
+  const handleRegisterExerciseInHistory = async () => {
+    setIsSubmitting(true);
+    try {
+      await api.post("/history", { exercise_id: id });
 
-          toast.show({
-            title,
-            placement: "bottom",
-            bgColor: "red.500",
-          });
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      toast.show({
+        title: "Parabéns! Exercício registrado no seu histórico",
+        placement: "bottom",
+        bgColor: "green.700",
+      });
 
-      fetchExerciseDetails();
-    }, [id])
-  );
+      navigate("history");
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível registrar o exercício.";
+
+      toast.show({
+        title,
+        placement: "bottom",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchExerciseDetails = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get(`/exercises/${id}`);
+        setExercise(response.data);
+      } catch (error) {
+        const isAppError = error instanceof AppError;
+        const title = isAppError
+          ? error.message
+          : "Não foi possível carregar os grupos musculares.";
+
+        toast.show({
+          title,
+          placement: "bottom",
+          bgColor: "red.500",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExerciseDetails();
+  }, [id]);
 
   if (isLoading) {
     return <Loading />;
@@ -143,7 +170,11 @@ export const Exercise = () => {
               </HStack>
             </HStack>
 
-            <Button title="Marcar como realizado" />
+            <Button
+              title="Marcar como realizado"
+              onPress={handleRegisterExerciseInHistory}
+              isLoading={isSubmitting}
+            />
           </Box>
         </VStack>
       </ScrollView>

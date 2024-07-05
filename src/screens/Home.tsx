@@ -48,33 +48,31 @@ export const Home = () => {
     fetchGroups();
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchExercisesByGroup = async () => {
-        setIsLoading(true);
-        try {
-          const response = await api.get(`/exercises/bygroup/${selectedGroup}`);
+  useEffect(() => {
+    const fetchExercisesByGroup = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get(`/exercises/bygroup/${selectedGroup}`);
 
-          setExercises(response.data);
-        } catch (error) {
-          const isAppError = error instanceof AppError;
-          const title = isAppError
-            ? error.message
-            : "Não foi possível carregar os grupos musculares.";
+        setExercises(response.data);
+      } catch (error) {
+        const isAppError = error instanceof AppError;
+        const title = isAppError
+          ? error.message
+          : "Não foi possível carregar os grupos musculares.";
 
-          toast.show({
-            title,
-            placement: "bottom",
-            bgColor: "red.500",
-          });
-        } finally {
-          setIsLoading(false);
-        }
-      };
+        toast.show({
+          title,
+          placement: "bottom",
+          bgColor: "red.500",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      fetchExercisesByGroup();
-    }, [selectedGroup])
-  );
+    fetchExercisesByGroup();
+  }, [selectedGroup]);
 
   return (
     <VStack flex={1}>
