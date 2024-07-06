@@ -12,7 +12,7 @@ import {
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { TouchableOpacity } from 'react-native'
-import { AppError } from 'utils/AppError'
+import { AppError } from '@/utils/AppError'
 import { z } from 'zod'
 
 import defaultUserAvatar from '@/assets/userPhotoDefault.png'

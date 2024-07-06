@@ -10,7 +10,7 @@ import {
   VStack,
 } from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
-import { AppError } from 'utils/AppError'
+import { AppError } from '@/utils/AppError'
 import { z } from 'zod'
 
 import BackgroundImg from '@/assets/background.png'

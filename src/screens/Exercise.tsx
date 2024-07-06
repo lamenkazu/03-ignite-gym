@@ -13,7 +13,7 @@ import {
 } from 'native-base'
 import { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-import { AppError } from 'utils/AppError'
+import { AppError } from '@/utils/AppError'
 
 import BodySvg from '@/assets/body.svg'
 import RepetitionsSvg from '@/assets/repetitions.svg'

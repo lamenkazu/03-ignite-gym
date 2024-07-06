@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { FlatList, Heading, HStack, Text, useToast, VStack } from 'native-base'
 import { useEffect, useState } from 'react'
-import { AppError } from 'utils/AppError'
+import { AppError } from '@/utils/AppError'
 
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { Group } from '@/components/Group'
