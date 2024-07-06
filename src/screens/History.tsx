@@ -1,12 +1,12 @@
 import { Heading, SectionList, Text, useToast, VStack } from 'native-base'
 import { useEffect, useState } from 'react'
-import { AppError } from '@/utils/AppError'
 
 import { Header } from '@/components/Header'
 import { HistoryCard } from '@/components/HistoryCard'
 import { Loading } from '@/components/Loading'
 import { HistoryByDayDTO } from '@/dtos/HistoryDTO'
 import { api } from '@/lib/axios'
+import { AppError } from '@/utils/AppError'
 
 export const History = () => {
   const toast = useToast()

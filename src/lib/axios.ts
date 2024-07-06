@@ -86,6 +86,7 @@ api.registerInterceptTokenManager = (signOut) => {
 
               console.log('TOKEN ATUALIZADO!')
               resolve(api(originalRequestConfig))
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
               failedQueue.forEach((request) => {
                 request.onFailure(error)
