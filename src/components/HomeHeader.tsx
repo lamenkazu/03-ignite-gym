@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { UserPhoto } from "./UserPhoto";
 
 import defaultUserAvatar from "@/assets/userPhotoDefault.png";
+import { api } from "@/lib/axios";
 
 export const HomeHeader = () => {
   const { user, signOut } = useAuth();
@@ -20,7 +21,7 @@ export const HomeHeader = () => {
         source={
           user.avatar
             ? {
-                uri: user.avatar,
+                uri: `${api.defaults.baseURL}/avatar/${user.avatar}`,
               }
             : defaultUserAvatar
         }

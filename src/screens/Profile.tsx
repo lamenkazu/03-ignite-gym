@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Alert, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Center,
   Heading,
@@ -10,18 +12,18 @@ import {
   VStack,
 } from "native-base";
 
+import { z } from "zod";
+import { api } from "@/lib/axios";
+import { useAuth } from "@/hooks/useAuth";
+import { AppError } from "utils/AppError";
+import * as ImagePicker from "expo-image-picker";
+
 import { Header } from "@/components/Header";
 import { UserPhoto } from "@/components/UserPhoto";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 
-import * as ImagePicker from "expo-image-picker";
-import { z } from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { useAuth } from "@/hooks/useAuth";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "@/lib/axios";
-import { AppError } from "utils/AppError";
+import defaultUserAvatar from "@/assets/userPhotoDefault.png";
 
 const PHOTO_SIZE = 33;
 
@@ -74,6 +76,9 @@ const profileFormSchema = z
 type ProfileFormSchema = z.infer<typeof profileFormSchema>;
 
 export const Profile = () => {
+  const toast = useToast();
+  const { user, updateUser } = useAuth();
+
   /**** Photo *****/
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState(
@@ -115,11 +120,33 @@ export const Profile = () => {
           name: `${user.name}.${fileExtension}`.toLowerCase(),
           uri: selectedPhoto.assets[0].uri,
           type: selectedPhoto.assets[0].mimeType,
-        };
+        } as any;
 
-        console.log(photoFile);
+        const uplaodUserPhotoForm = new FormData();
+        uplaodUserPhotoForm.append("avatar", photoFile);
+
+        const updateAvatarResponse = await api.patch(
+          "/users/avatar",
+          uplaodUserPhotoForm,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const updatedUser = user;
+        updatedUser.avatar = updateAvatarResponse.data.avatar;
+        updateUser(updatedUser);
 
         // setUserPhoto(selectedPhoto.assets[0].uri);
+
+        toast.show({
+          title: "Foto atualizada!",
+          placement: "bottom",
+          marginBottom: "5",
+          bgColor: "green.700",
+        });
       }
     } catch (error) {
       console.log(error);
@@ -127,9 +154,6 @@ export const Profile = () => {
       setIsPhotoLoading(false);
     }
   };
-
-  const toast = useToast();
-  const { user, updateUser } = useAuth();
 
   /*** Form ***/
   const {
@@ -193,7 +217,13 @@ export const Profile = () => {
             />
           ) : (
             <UserPhoto
-              source={{ uri: userPhoto }}
+              source={
+                user.avatar
+                  ? {
+                      uri: `${api.defaults.baseURL}/avatar/${user.avatar}`,
+                    }
+                  : defaultUserAvatar
+              }
               alt="foto do usuario"
               size={PHOTO_SIZE}
             />
