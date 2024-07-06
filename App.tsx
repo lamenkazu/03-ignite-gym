@@ -1,22 +1,22 @@
-import { StatusBar, View } from "react-native";
-import { NativeBaseProvider } from "native-base";
+/* eslint-disable camelcase */
 import {
-  useFonts,
   Roboto_400Regular,
   Roboto_700Bold,
-} from "@expo-google-fonts/roboto";
+  useFonts,
+} from '@expo-google-fonts/roboto'
+import { NativeBaseProvider } from 'native-base'
+import { StatusBar } from 'react-native'
 
-import { AuthContextProvider } from "@/context/AuthContext";
-import { Routes } from "@/routes";
-
-import { THEME } from "@/theme";
-import { Loading } from "@/components/Loading";
+import { Loading } from '@/components/Loading'
+import { AuthContextProvider } from '@/context/AuthContext'
+import { Routes } from '@/routes'
+import { THEME } from '@/theme'
 
 export default function App() {
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_700Bold,
-  });
+  })
 
   return (
     <NativeBaseProvider theme={THEME}>
@@ -34,5 +34,5 @@ export default function App() {
         <Loading />
       )}
     </NativeBaseProvider>
-  );
+  )
 }

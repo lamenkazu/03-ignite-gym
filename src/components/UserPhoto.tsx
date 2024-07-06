@@ -1,7 +1,7 @@
-import { Image, IImageProps } from "native-base";
+import { IImageProps, Image } from 'native-base'
 
 interface UserPhotoProps extends IImageProps {
-  size: number;
+  size: number
 }
 
 export const UserPhoto = ({ size, ...props }: UserPhotoProps) => {
@@ -10,9 +10,10 @@ export const UserPhoto = ({ size, ...props }: UserPhotoProps) => {
       {...props}
       w={size}
       height={size}
-      rounded={"full"}
+      rounded={'full'}
       borderWidth={2}
-      borderColor={"gray.400"}
+      borderColor={'gray.400'}
+      alt="foto do usuario"
     />
-  );
-};
+  )
+}

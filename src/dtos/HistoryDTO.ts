@@ -1,14 +1,12 @@
-import { string } from "zod";
-
 export interface HistoryDTO {
-  id: string;
-  name: string;
-  group: string;
-  hour: string;
-  created_at: string;
+  id: string
+  name: string
+  group: string
+  hour: string
+  created_at: string
 }
 
 export interface HistoryByDayDTO {
-  title: string;
-  data: HistoryDTO[];
+  title: string
+  data: HistoryDTO[]
 }

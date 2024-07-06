@@ -1,12 +1,12 @@
-import { Heading, HStack, Icon, Image, Text, VStack } from "native-base";
-import { TouchableOpacity, TouchableOpacityProps } from "react-native";
+import { Entypo } from '@expo/vector-icons'
+import { Heading, HStack, Icon, Image, Text, VStack } from 'native-base'
+import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
 
-import { Entypo } from "@expo/vector-icons";
-import { ExerciseDTO } from "@/dtos/ExerciseDTO";
-import { api } from "@/lib/axios";
+import { ExerciseDTO } from '@/dtos/ExerciseDTO'
+import { api } from '@/lib/axios'
 
 interface ExerciseCardProps extends TouchableOpacityProps {
-  data: ExerciseDTO;
+  data: ExerciseDTO
 }
 
 export const ExerciseCard = ({ data, ...props }: ExerciseCardProps) => {
@@ -28,7 +28,7 @@ export const ExerciseCard = ({ data, ...props }: ExerciseCardProps) => {
           w={16}
           h={16}
           mr={4}
-          rounded={"md"}
+          rounded={'md'}
         />
         <VStack flex={1}>
           <Heading fontSize="lg" color="white">
@@ -43,5 +43,5 @@ export const ExerciseCard = ({ data, ...props }: ExerciseCardProps) => {
         <Icon as={Entypo} name="chevron-thin-right" color="gray.300" />
       </HStack>
     </TouchableOpacity>
-  );
-};
+  )
+}

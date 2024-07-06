@@ -1,4 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigation } from '@react-navigation/native'
 import {
   Center,
   Heading,
@@ -7,33 +8,31 @@ import {
   Text,
   useToast,
   VStack,
-} from "native-base";
-import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from 'native-base'
+import { Controller, useForm } from 'react-hook-form'
+import { AppError } from 'utils/AppError'
+import { z } from 'zod'
 
-import Logo from "@/assets/logo.svg";
-import BackgroundImg from "@/assets/background.png";
-
-import { Input } from "@/components/Input";
-import { Button } from "@/components/Button";
-import { AuthNavigatorAuthProps } from "@/routes/auth.routes";
-import { useAuth } from "@/hooks/useAuth";
-import { AppError } from "utils/AppError";
+import BackgroundImg from '@/assets/background.png'
+import Logo from '@/assets/logo.svg'
+import { Button } from '@/components/Button'
+import { Input } from '@/components/Input'
+import { useAuth } from '@/hooks/useAuth'
+import { AuthNavigatorAuthProps } from '@/routes/auth.routes'
 
 const signInSchema = z.object({
-  email: z.string().min(1, "Informe o e-mail").email("E-mail inválido."),
+  email: z.string().min(1, 'Informe o e-mail').email('E-mail inválido.'),
   password: z
     .string()
-    .min(1, "Informe a senha")
-    .min(6, "A senha deve ter pelo menos 6 dígitos."),
-});
-type SignInSchema = z.infer<typeof signInSchema>;
+    .min(1, 'Informe a senha')
+    .min(6, 'A senha deve ter pelo menos 6 dígitos.'),
+})
+type SignInSchema = z.infer<typeof signInSchema>
 
 export const SignIn = () => {
-  const { signIn } = useAuth();
-  const { navigate } = useNavigation<AuthNavigatorAuthProps>();
-  const toast = useToast();
+  const { signIn } = useAuth()
+  const { navigate } = useNavigation<AuthNavigatorAuthProps>()
+  const toast = useToast()
 
   const {
     control,
@@ -42,32 +41,32 @@ export const SignIn = () => {
   } = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-  });
+  })
 
   const handleNewAccount = () => {
-    navigate("signUp");
-  };
+    navigate('signUp')
+  }
 
   const handleSignIn = async ({ email, password }: SignInSchema) => {
     try {
-      await signIn(email, password);
+      await signIn(email, password)
     } catch (error) {
-      const isAppError = error instanceof AppError;
+      const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : "Não foi possível conectar. Tente novamente.";
+        : 'Não foi possível conectar. Tente novamente.'
 
       toast.show({
         title,
-        placement: "bottom",
-        marginBottom: "5",
-        bgColor: "red.500",
-      });
+        placement: 'bottom',
+        marginBottom: '5',
+        bgColor: 'red.500',
+      })
     }
-  };
+  }
 
   return (
     <ScrollView
@@ -79,24 +78,24 @@ export const SignIn = () => {
         defaultSource={BackgroundImg}
         alt="Pessoas treinando"
         resizeMode="stretch"
-        position={"absolute"}
+        position={'absolute'}
       />
 
       <VStack flex={1} px={10}>
         <Center my={24}>
           <Logo />
 
-          <Text color={"gray.100"} fontSize={"sm"}>
+          <Text color={'gray.100'} fontSize={'sm'}>
             Treine sua mente e o seu corpo
           </Text>
         </Center>
 
         <Center>
           <Heading
-            color={"gray.100"}
-            fontSize={"xl"}
+            color={'gray.100'}
+            fontSize={'xl'}
             mb={6}
-            fontFamily={"heading"}
+            fontFamily={'heading'}
           >
             Acesse sua conta
           </Heading>
@@ -139,16 +138,16 @@ export const SignIn = () => {
         </Center>
 
         <Center mt={24}>
-          <Text color={"gray.100"} fontSize={"sm"} mb={3} fontFamily={"body"}>
+          <Text color={'gray.100'} fontSize={'sm'} mb={3} fontFamily={'body'}>
             Ainda não tem acesso?
           </Text>
           <Button
             title="Criar conta"
-            variant={"outline"}
+            variant={'outline'}
             onPress={handleNewAccount}
           />
         </Center>
       </VStack>
     </ScrollView>
-  );
-};
+  )
+}

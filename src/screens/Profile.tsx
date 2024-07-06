@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { TouchableOpacity } from "react-native";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as ImagePicker from 'expo-image-picker'
 import {
   Center,
   Heading,
@@ -10,152 +8,145 @@ import {
   Text,
   useToast,
   VStack,
-} from "native-base";
+} from 'native-base'
+import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { TouchableOpacity } from 'react-native'
+import { AppError } from 'utils/AppError'
+import { z } from 'zod'
 
-import { z } from "zod";
-import { api } from "@/lib/axios";
-import { useAuth } from "@/hooks/useAuth";
-import { AppError } from "utils/AppError";
-import * as ImagePicker from "expo-image-picker";
+import defaultUserAvatar from '@/assets/userPhotoDefault.png'
+import { Button } from '@/components/Button'
+import { Header } from '@/components/Header'
+import { Input } from '@/components/Input'
+import { UserPhoto } from '@/components/UserPhoto'
+import { useAuth } from '@/hooks/useAuth'
+import { api } from '@/lib/axios'
 
-import { Header } from "@/components/Header";
-import { UserPhoto } from "@/components/UserPhoto";
-import { Input } from "@/components/Input";
-import { Button } from "@/components/Button";
-
-import defaultUserAvatar from "@/assets/userPhotoDefault.png";
-
-const PHOTO_SIZE = 33;
+const PHOTO_SIZE = 33
 
 const profileFormSchema = z
   .object({
-    name: z.string().min(1, "Informe o nome."),
+    name: z.string().min(1, 'Informe o nome.'),
     email: z.string(),
     oldPassword: z
       .string()
       .optional()
-      .transform((value) => (value === "" ? undefined : value))
+      .transform((value) => (value === '' ? undefined : value))
       .refine(
         (value) => value === undefined || value.length >= 6,
-        "A senha deve ter pelo menos 6 dígitos."
+        'A senha deve ter pelo menos 6 dígitos.',
       ),
     password: z
       .string()
       .optional()
-      .transform((value) => (value === "" ? undefined : value))
+      .transform((value) => (value === '' ? undefined : value))
       .refine(
         (value) => value === undefined || value.length >= 6,
-        "A senha deve ter pelo menos 6 dígitos."
+        'A senha deve ter pelo menos 6 dígitos.',
       ),
     confirmPassword: z
       .string()
       .optional()
-      .transform((value) => (value === "" ? undefined : value))
+      .transform((value) => (value === '' ? undefined : value))
       .refine(
         (value) => value === undefined || value.length >= 6,
-        "A senha deve ter pelo menos 6 dígitos."
+        'A senha deve ter pelo menos 6 dígitos.',
       ),
   })
   .superRefine((data, context) => {
     if (data.password && data.confirmPassword && !data.oldPassword) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["oldPassword"],
-        message: "Deve inserir a senha antiga para alterar a senha.",
-      });
+        path: ['oldPassword'],
+        message: 'Deve inserir a senha antiga para alterar a senha.',
+      })
     }
     if (data.password !== data.confirmPassword) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["confirmPassword"],
-        message: "As senhas devem ser iguais",
-      });
+        path: ['confirmPassword'],
+        message: 'As senhas devem ser iguais',
+      })
     }
-  });
+  })
 
-type ProfileFormSchema = z.infer<typeof profileFormSchema>;
+type ProfileFormSchema = z.infer<typeof profileFormSchema>
 
 export const Profile = () => {
-  const toast = useToast();
-  const { user, updateUser } = useAuth();
+  const toast = useToast()
+  const { user, updateUser } = useAuth()
 
-  /**** Photo *****/
-  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
-  const [userPhoto, setUserPhoto] = useState(
-    "https://github.com/lamenkazu.png"
-  );
+  /** ** Photo *****/
+  const [isPhotoLoading, setIsPhotoLoading] = useState(false)
   const handleUserPhotoSelect = async () => {
-    setIsPhotoLoading(true);
+    setIsPhotoLoading(true)
     try {
       const selectedPhoto = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images, // tipo de conteudo que quer selecionar da galeria do usuario
         quality: 1, // qualidade da imagem vai de 0 a 1
         aspect: [4, 4], // Aspecto da imagem. No caso, 4 por 4 é uma imagem quadrada, poderia ser 3/4 e dai em diante.
         allowsEditing: true, // Permite o usuário editar a imagem após selecionar ela.
-      });
+      })
 
       if (selectedPhoto.canceled) {
-        return; //Se o usuario cancelar a seleção de foto, nada deve ser feito.
+        return // Se o usuario cancelar a seleção de foto, nada deve ser feito.
       }
 
-      const { fileSize, uri, fileName } = selectedPhoto.assets[0];
+      const { fileSize, uri } = selectedPhoto.assets[0]
 
       if (uri && fileSize) {
-        const fileSizeInMb = fileSize / 1024 / 1024;
+        const fileSizeInMb = fileSize / 1024 / 1024
 
         if (fileSizeInMb > 5) {
           return toast.show({
-            title: "Imagem muito grande! Ecolha uma de até 5MB",
-            placement: "top",
-            marginTop: "40",
-            bgColor: "red.500",
-          });
+            title: 'Imagem muito grande! Ecolha uma de até 5MB',
+            placement: 'top',
+            marginTop: '40',
+            bgColor: 'red.500',
+          })
         }
 
-        const fileExtension = selectedPhoto.assets[0].mimeType
-          ?.split("/")
-          .pop();
+        const fileExtension = selectedPhoto.assets[0].mimeType?.split('/').pop()
 
         const photoFile = {
           name: `${user.name}.${fileExtension}`.toLowerCase(),
           uri: selectedPhoto.assets[0].uri,
-          type: selectedPhoto.assets[0].mimeType,
-        } as any;
+          type: selectedPhoto.assets[0].mimeType!,
+        } as unknown as Blob
 
-        const uplaodUserPhotoForm = new FormData();
-        uplaodUserPhotoForm.append("avatar", photoFile);
+        const uplaodUserPhotoForm = new FormData()
+        uplaodUserPhotoForm.append('avatar', photoFile)
 
         const updateAvatarResponse = await api.patch(
-          "/users/avatar",
+          '/users/avatar',
           uplaodUserPhotoForm,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
+              'Content-Type': 'multipart/form-data',
             },
-          }
-        );
+          },
+        )
 
-        const updatedUser = user;
-        updatedUser.avatar = updateAvatarResponse.data.avatar;
-        updateUser(updatedUser);
-
-        // setUserPhoto(selectedPhoto.assets[0].uri);
+        const updatedUser = user
+        updatedUser.avatar = updateAvatarResponse.data.avatar
+        updateUser(updatedUser)
 
         toast.show({
-          title: "Foto atualizada!",
-          placement: "bottom",
-          marginBottom: "5",
-          bgColor: "green.700",
-        });
+          title: 'Foto atualizada!',
+          placement: 'bottom',
+          marginBottom: '5',
+          bgColor: 'green.700',
+        })
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     } finally {
-      setIsPhotoLoading(false);
+      setIsPhotoLoading(false)
     }
-  };
+  }
 
-  /*** Form ***/
+  /** * Form ***/
   const {
     control,
     handleSubmit,
@@ -166,40 +157,40 @@ export const Profile = () => {
       name: user.name,
       email: user.email,
     },
-  });
+  })
 
   const handleUpdateProfile = async (data: ProfileFormSchema) => {
     try {
-      await api.put("/users", {
+      await api.put('/users', {
         name: data.name,
         password: data.password,
         old_password: data.oldPassword,
-      });
+      })
 
-      const updatedUser = user;
-      updatedUser.name = data.name;
-      await updateUser(updatedUser);
+      const updatedUser = user
+      updatedUser.name = data.name
+      await updateUser(updatedUser)
 
       toast.show({
-        title: "Perfil atualizado com sucesso!",
-        placement: "bottom",
-        marginBottom: "5",
-        bgColor: "green.700",
-      });
+        title: 'Perfil atualizado com sucesso!',
+        placement: 'bottom',
+        marginBottom: '5',
+        bgColor: 'green.700',
+      })
     } catch (error) {
-      const isAppError = error instanceof AppError;
+      const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : "Não foi possível atualizar os seus dados :(\nTente novamente mais tarde!";
+        : 'Não foi possível atualizar os seus dados :(\nTente novamente mais tarde!'
 
       toast.show({
         title,
-        placement: "bottom",
-        marginBottom: "5",
-        bgColor: "red.500",
-      });
+        placement: 'bottom',
+        marginBottom: '5',
+        bgColor: 'red.500',
+      })
     }
-  };
+  }
 
   return (
     <VStack flex={1}>
@@ -211,7 +202,7 @@ export const Profile = () => {
             <Skeleton
               w={PHOTO_SIZE}
               h={PHOTO_SIZE}
-              rounded={"full"}
+              rounded={'full'}
               startColor="gray.500"
               endColor="gray.400"
             />
@@ -324,5 +315,5 @@ export const Profile = () => {
         </VStack>
       </ScrollView>
     </VStack>
-  );
-};
+  )
+}

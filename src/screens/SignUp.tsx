@@ -1,4 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigation } from '@react-navigation/native'
 import {
   Center,
   Heading,
@@ -7,73 +8,69 @@ import {
   Text,
   useToast,
   VStack,
-} from "native-base";
-import { Controller, useForm } from "react-hook-form";
+} from 'native-base'
+import { Controller, useForm } from 'react-hook-form'
+import { AppError } from 'utils/AppError'
+import { z } from 'zod'
 
-import { z } from "zod";
-import axios from "axios";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "@/lib/axios";
-
-import Logo from "@/assets/logo.svg";
-import BackgroundImg from "@/assets/background.png";
-
-import { Input } from "@/components/Input";
-import { Button } from "@/components/Button";
-import { AuthNavigatorAuthProps } from "@/routes/auth.routes";
-import { AppError } from "utils/AppError";
-import { useAuth } from "@/hooks/useAuth";
+import BackgroundImg from '@/assets/background.png'
+import Logo from '@/assets/logo.svg'
+import { Button } from '@/components/Button'
+import { Input } from '@/components/Input'
+import { useAuth } from '@/hooks/useAuth'
+import { api } from '@/lib/axios'
+import { AuthNavigatorAuthProps } from '@/routes/auth.routes'
 
 const signUpSchema = z
   .object({
-    name: z.string().min(1, "Informe o nome."),
-    email: z.string().min(1, "Informe o e-mail").email("E-mail inválido."),
+    name: z.string().min(1, 'Informe o nome.'),
+    email: z.string().min(1, 'Informe o e-mail').email('E-mail inválido.'),
     password: z
       .string()
-      .min(1, "Informe a senha")
-      .min(6, "A senha deve ter pelo menos 6 dígitos."),
-    confirmPassword: z.string().min(1, "Confirme a senha."),
+      .min(1, 'Informe a senha')
+      .min(6, 'A senha deve ter pelo menos 6 dígitos.'),
+    confirmPassword: z.string().min(1, 'Confirme a senha.'),
   })
   .superRefine((data, context) => {
     if (data.password !== data.confirmPassword) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["confirmPassword"],
-        message: "As senhas devem ser iguais",
-      });
+        path: ['confirmPassword'],
+        message: 'As senhas devem ser iguais',
+      })
     }
-  });
+  })
 
-type SignUpSchema = z.infer<typeof signUpSchema>;
+type SignUpSchema = z.infer<typeof signUpSchema>
 
 export const SignUp = () => {
-  const { goBack } = useNavigation<AuthNavigatorAuthProps>();
-  const toast = useToast();
-  const { signIn } = useAuth();
+  const { goBack } = useNavigation<AuthNavigatorAuthProps>()
+  const toast = useToast()
+  const { signIn } = useAuth()
 
   const handleBackToLogin = () => {
-    goBack();
-  };
+    goBack()
+  }
 
   const handleSignUp = async ({ name, email, password }: SignUpSchema) => {
     try {
-      await api.post("/users", { name, email, password }); // cria usuario
+      await api.post('/users', { name, email, password }) // cria usuario
 
-      await signIn(email, password); // loga o usuario após criado.
+      await signIn(email, password) // loga o usuario após criado.
     } catch (error) {
-      const isAppError = error instanceof AppError;
+      const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : "Não foi possivel criara conta. Tente novamente.";
+        : 'Não foi possivel criara conta. Tente novamente.'
 
       toast.show({
         title,
-        placement: "bottom",
-        marginBottom: "5",
-        bgColor: "red.500",
-      });
+        placement: 'bottom',
+        marginBottom: '5',
+        bgColor: 'red.500',
+      })
     }
-  };
+  }
 
   const {
     control,
@@ -82,12 +79,12 @@ export const SignUp = () => {
   } = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
-  });
+  })
 
   return (
     <ScrollView
@@ -99,24 +96,24 @@ export const SignUp = () => {
         defaultSource={BackgroundImg}
         alt="Pessoas treinando"
         resizeMode="stretch"
-        position={"absolute"}
+        position={'absolute'}
       />
 
       <VStack flex={1} px={10}>
         <Center my={24}>
           <Logo />
 
-          <Text color={"gray.100"} fontSize={"sm"}>
+          <Text color={'gray.100'} fontSize={'sm'}>
             Treine sua mente e o seu corpo
           </Text>
         </Center>
 
         <Center>
           <Heading
-            color={"gray.100"}
-            fontSize={"xl"}
+            color={'gray.100'}
+            fontSize={'xl'}
             mb={6}
-            fontFamily={"heading"}
+            fontFamily={'heading'}
           >
             Crie sua conta
           </Heading>
@@ -189,10 +186,10 @@ export const SignUp = () => {
         <Button
           mt={24}
           title="Voltar para o login"
-          variant={"outline"}
+          variant={'outline'}
           onPress={handleBackToLogin}
         />
       </VStack>
     </ScrollView>
-  );
-};
+  )
+}

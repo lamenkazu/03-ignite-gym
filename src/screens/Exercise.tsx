@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { Feather } from '@expo/vector-icons'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import {
   Box,
-  Center,
   Heading,
   HStack,
   Icon,
@@ -10,110 +10,103 @@ import {
   Text,
   useToast,
   VStack,
-} from "native-base";
-import { TouchableOpacity } from "react-native";
+} from 'native-base'
+import { useEffect, useState } from 'react'
+import { TouchableOpacity } from 'react-native'
+import { AppError } from 'utils/AppError'
 
-import { AppNavigationRoutesProp } from "@/routes/app.routes";
-import { AppError } from "utils/AppError";
-import { api } from "@/lib/axios";
-
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
-import { Button } from "@/components/Button";
-import { Loading } from "@/components/Loading";
-
-import { Feather } from "@expo/vector-icons";
-import BodySvg from "@/assets/body.svg";
-import SeriesSvg from "@/assets/series.svg";
-import RepetitionsSvg from "@/assets/repetitions.svg";
-import { ExerciseDTO } from "@/dtos/ExerciseDTO";
+import BodySvg from '@/assets/body.svg'
+import RepetitionsSvg from '@/assets/repetitions.svg'
+import SeriesSvg from '@/assets/series.svg'
+import { Button } from '@/components/Button'
+import { Loading } from '@/components/Loading'
+import { ExerciseDTO } from '@/dtos/ExerciseDTO'
+import { api } from '@/lib/axios'
+import { AppNavigationRoutesProp } from '@/routes/app.routes'
 
 interface RouteParams {
-  id: string;
+  id: string
 }
 
 export const Exercise = () => {
-  const toast = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO);
+  const toast = useToast()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO)
 
-  const { goBack, navigate } = useNavigation<AppNavigationRoutesProp>();
+  const { goBack, navigate } = useNavigation<AppNavigationRoutesProp>()
   const handleGoBack = () => {
-    goBack();
-  };
+    goBack()
+  }
 
-  const { params } = useRoute();
-  const { id } = params as RouteParams;
+  const { params } = useRoute()
+  const { id } = params as RouteParams
 
   const handleRegisterExerciseInHistory = async () => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
-      await api.post("/history", { exercise_id: id });
+      await api.post('/history', { exercise_id: id })
 
       toast.show({
-        title: "Parabéns! Exercício registrado no seu histórico",
-        placement: "bottom",
-        marginBottom: "5",
-        bgColor: "green.700",
-      });
+        title: 'Parabéns! Exercício registrado no seu histórico',
+        placement: 'bottom',
+        marginBottom: '5',
+        bgColor: 'green.700',
+      })
 
-      navigate("history");
+      navigate('history')
     } catch (error) {
-      const isAppError = error instanceof AppError;
+      const isAppError = error instanceof AppError
       const title = isAppError
         ? error.message
-        : "Não foi possível registrar o exercício.";
+        : 'Não foi possível registrar o exercício.'
 
       toast.show({
         title,
-        placement: "bottom",
-        marginBottom: "5",
-        bgColor: "red.500",
-      });
+        placement: 'bottom',
+        marginBottom: '5',
+        bgColor: 'red.500',
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   useEffect(() => {
     const fetchExerciseDetails = async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
-        const response = await api.get(`/exercises/${id}`);
-        setExercise(response.data);
+        const response = await api.get(`/exercises/${id}`)
+        setExercise(response.data)
       } catch (error) {
-        const isAppError = error instanceof AppError;
+        const isAppError = error instanceof AppError
         const title = isAppError
           ? error.message
-          : "Não foi possível carregar os grupos musculares.";
+          : 'Não foi possível carregar os grupos musculares.'
 
         toast.show({
           title,
-          placement: "bottom",
-          marginBottom: "5",
-          bgColor: "red.500",
-        });
+          placement: 'bottom',
+          marginBottom: '5',
+          bgColor: 'red.500',
+        })
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchExerciseDetails();
-  }, [id]);
+    fetchExerciseDetails()
+  }, [id, toast])
 
   if (isLoading) {
-    return <Loading />;
+    return <Loading />
   }
 
   return (
     <VStack flex={1}>
-      <VStack bg={"gray.600"} px={8} pt={12}>
+      <VStack bg={'gray.600'} px={8} pt={12}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Icon as={Feather} name="arrow-left" color={"green.500"} size={6} />
+          <Icon as={Feather} name="arrow-left" color={'green.500'} size={6} />
         </TouchableOpacity>
 
         <HStack
@@ -138,7 +131,7 @@ export const Exercise = () => {
 
       <ScrollView>
         <VStack p={8}>
-          <Box rounded={"lg"} mb={3} overflow={"hidden"}>
+          <Box rounded={'lg'} mb={3} overflow={'hidden'}>
             <Image
               source={{
                 uri: `${api.defaults.baseURL}/exercise/demo/${exercise.demo}`,
@@ -182,5 +175,5 @@ export const Exercise = () => {
         </VStack>
       </ScrollView>
     </VStack>
-  );
-};
+  )
+}

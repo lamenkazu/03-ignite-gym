@@ -1,80 +1,79 @@
-import { useCallback, useEffect, useState } from "react";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { FlatList, Heading, HStack, Text, useToast, VStack } from "native-base";
+import { useNavigation } from '@react-navigation/native'
+import { FlatList, Heading, HStack, Text, useToast, VStack } from 'native-base'
+import { useEffect, useState } from 'react'
+import { AppError } from 'utils/AppError'
 
-import { AppNavigationRoutesProp } from "@/routes/app.routes";
-import { AppError } from "utils/AppError";
-import { ExerciseDTO } from "@/dtos/ExerciseDTO";
-import { api } from "@/lib/axios";
-
-import { ExerciseCard } from "@/components/ExerciseCard";
-import { HomeHeader } from "@/components/HomeHeader";
-import { Group } from "@/components/Group";
-import { Loading } from "@/components/Loading";
+import { ExerciseCard } from '@/components/ExerciseCard'
+import { Group } from '@/components/Group'
+import { HomeHeader } from '@/components/HomeHeader'
+import { Loading } from '@/components/Loading'
+import { ExerciseDTO } from '@/dtos/ExerciseDTO'
+import { api } from '@/lib/axios'
+import { AppNavigationRoutesProp } from '@/routes/app.routes'
 
 export const Home = () => {
-  const toast = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [groups, setGroups] = useState<string[]>([]);
-  const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState("antebraço");
+  const toast = useToast()
+  const [isLoading, setIsLoading] = useState(false)
+  const [groups, setGroups] = useState<string[]>([])
+  const [exercises, setExercises] = useState<ExerciseDTO[]>([])
+  const [selectedGroup, setSelectedGroup] = useState('antebraço')
 
-  const { navigate } = useNavigation<AppNavigationRoutesProp>();
+  const { navigate } = useNavigation<AppNavigationRoutesProp>()
 
   const handleOpenExerciseDetails = (id: string) => {
-    navigate("exercise", { id });
-  };
+    navigate('exercise', { id })
+  }
 
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const response = await api.get("/groups");
+        const response = await api.get('/groups')
 
-        setGroups(response.data);
+        setGroups(response.data)
       } catch (error) {
-        const isAppError = error instanceof AppError;
+        const isAppError = error instanceof AppError
         const title = isAppError
           ? error.message
-          : "Não foi possível carregar os grupos musculares.";
+          : 'Não foi possível carregar os grupos musculares.'
 
         toast.show({
           title,
-          placement: "bottom",
-          marginBottom: "5",
-          bgColor: "red.500",
-        });
+          placement: 'bottom',
+          marginBottom: '5',
+          bgColor: 'red.500',
+        })
       }
-    };
+    }
 
-    fetchGroups();
-  }, []);
+    fetchGroups()
+  }, [toast])
 
   useEffect(() => {
     const fetchExercisesByGroup = async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
-        const response = await api.get(`/exercises/bygroup/${selectedGroup}`);
+        const response = await api.get(`/exercises/bygroup/${selectedGroup}`)
 
-        setExercises(response.data);
+        setExercises(response.data)
       } catch (error) {
-        const isAppError = error instanceof AppError;
+        const isAppError = error instanceof AppError
         const title = isAppError
           ? error.message
-          : "Não foi possível carregar os grupos musculares.";
+          : 'Não foi possível carregar os grupos musculares.'
 
         toast.show({
           title,
-          placement: "bottom",
-          marginBottom: "5",
-          bgColor: "red.500",
-        });
+          placement: 'bottom',
+          marginBottom: '5',
+          bgColor: 'red.500',
+        })
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchExercisesByGroup();
-  }, [selectedGroup]);
+    fetchExercisesByGroup()
+  }, [selectedGroup, toast])
 
   return (
     <VStack flex={1}>
@@ -106,12 +105,12 @@ export const Home = () => {
         <Loading />
       ) : (
         <VStack flex={1} px={8}>
-          <HStack justifyContent={"space-between"} mb={5}>
-            <Heading color={"gray.200"} fontSize={"md"}>
+          <HStack justifyContent={'space-between'} mb={5}>
+            <Heading color={'gray.200'} fontSize={'md'}>
               Exercícios
             </Heading>
 
-            <Text color={"gray.200"} fontSize={"sm"}>
+            <Text color={'gray.200'} fontSize={'sm'}>
               {exercises.length}
             </Text>
           </HStack>
@@ -131,5 +130,5 @@ export const Home = () => {
         </VStack>
       )}
     </VStack>
-  );
-};
+  )
+}

@@ -1,36 +1,35 @@
-import { Platform } from "react-native";
-import { useTheme } from "native-base";
 import {
-  createBottomTabNavigator,
   BottomTabNavigationProp,
-} from "@react-navigation/bottom-tabs";
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs'
+import { useTheme } from 'native-base'
+import { Platform } from 'react-native'
 
-import { Exercise } from "@/screens/Exercise";
-import { History } from "@/screens/History";
-import { Home } from "@/screens/Home";
-import { Profile } from "@/screens/Profile";
+import HistorySvg from '@/assets/history.svg'
+import HomeSvg from '@/assets/home.svg'
+import ProfileSvg from '@/assets/profile.svg'
+import { Exercise } from '@/screens/Exercise'
+import { History } from '@/screens/History'
+import { Home } from '@/screens/Home'
+import { Profile } from '@/screens/Profile'
 
-import HomeSvg from "@/assets/home.svg";
-import HistorySvg from "@/assets/history.svg";
-import ProfileSvg from "@/assets/profile.svg";
-
-type AppRoutes = {
-  home: undefined;
-  history: undefined;
-  profile: undefined;
+type AppRoutesProps = {
+  home: undefined
+  history: undefined
+  profile: undefined
   exercise: {
-    id: string;
-  };
-};
+    id: string
+  }
+}
 
-export type AppNavigationRoutesProp = BottomTabNavigationProp<AppRoutes>;
+export type AppNavigationRoutesProp = BottomTabNavigationProp<AppRoutesProps>
 
-const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>();
+const { Navigator, Screen } = createBottomTabNavigator<AppRoutesProps>()
 
 export const AppRoutes = () => {
-  const { colors, sizes } = useTheme();
+  const { colors, sizes } = useTheme()
 
-  const iconSize = sizes[6];
+  const iconSize = sizes[6]
 
   return (
     <Navigator
@@ -42,7 +41,7 @@ export const AppRoutes = () => {
         tabBarStyle: {
           backgroundColor: colors.gray[600],
           borderTopWidth: 0,
-          height: Platform.OS === "android" ? "auto" : 96,
+          height: Platform.OS === 'android' ? 'auto' : 96,
           paddingBottom: sizes[10],
           paddingTop: sizes[6],
         },
@@ -81,5 +80,5 @@ export const AppRoutes = () => {
         options={{ tabBarButton: () => null }}
       />
     </Navigator>
-  );
-};
+  )
+}

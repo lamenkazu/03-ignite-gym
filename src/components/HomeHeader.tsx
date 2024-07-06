@@ -1,22 +1,22 @@
-import { TouchableOpacity } from "react-native";
-import { Heading, HStack, Icon, Text, VStack } from "native-base";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useAuth } from "@/hooks/useAuth";
+import { MaterialIcons } from '@expo/vector-icons'
+import { Heading, HStack, Icon, Text, VStack } from 'native-base'
+import { TouchableOpacity } from 'react-native'
 
-import { UserPhoto } from "./UserPhoto";
+import defaultUserAvatar from '@/assets/userPhotoDefault.png'
+import { useAuth } from '@/hooks/useAuth'
+import { api } from '@/lib/axios'
 
-import defaultUserAvatar from "@/assets/userPhotoDefault.png";
-import { api } from "@/lib/axios";
+import { UserPhoto } from './UserPhoto'
 
 export const HomeHeader = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useAuth()
 
   const handleSignOut = () => {
-    signOut();
-  };
+    signOut()
+  }
 
   return (
-    <HStack bg={"gray.600"} pt={16} pb={5} px={8} alignItems={"center"}>
+    <HStack bg={'gray.600'} pt={16} pb={5} px={8} alignItems={'center'}>
       <UserPhoto
         source={
           user.avatar
@@ -30,18 +30,18 @@ export const HomeHeader = () => {
         mr={4}
       />
       <VStack flex={1}>
-        <Text color={"gray.100"} fontSize={"md"}>
+        <Text color={'gray.100'} fontSize={'md'}>
           Olá,
         </Text>
 
-        <Heading color={"gray.100"} fontSize={"md"}>
+        <Heading color={'gray.100'} fontSize={'md'}>
           {user.name}
         </Heading>
       </VStack>
 
       <TouchableOpacity onPress={handleSignOut}>
-        <Icon as={MaterialIcons} name="logout" color={"gray.200"} size={7} />
+        <Icon as={MaterialIcons} name="logout" color={'gray.200'} size={7} />
       </TouchableOpacity>
     </HStack>
-  );
-};
+  )
+}
