@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useEffect, useState } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 
 import { UserDTO } from '@/dtos/UserDTO'
 import { api } from '@/lib/axios'
@@ -74,7 +80,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     await saveUser(updatedUser)
   }
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     setIsUserStorageDataLoading(true)
 
     await removeUser()
@@ -83,7 +89,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     setUser({} as UserDTO)
 
     setIsUserStorageDataLoading(false)
-  }
+  }, [])
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -101,6 +107,14 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
     loadUserData()
   }, [])
+
+  useEffect(() => {
+    const subscribe = api.registerInterceptTokenManager(signOut)
+
+    return () => {
+      subscribe()
+    }
+  }, [signOut])
 
   return (
     <AuthContext.Provider
