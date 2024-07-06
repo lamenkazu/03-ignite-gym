@@ -67,11 +67,11 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
     const { data } = await api.post('/sessions', { email, password })
 
-    if (data.user && data.token && data.refreshToken) {
+    if (data.user && data.token && data.refresh_token) {
       await userAndTokenSave({
         userData: data.user,
         token: data.token,
-        refreshToken: data.refreshToken,
+        refreshToken: data.refresh_token,
       })
       userAndTokenUpdate({
         userData: data.user,
