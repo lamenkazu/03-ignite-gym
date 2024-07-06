@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 
+import { getAuthToken } from '@/storage/authToken'
 import { AppError } from '@/utils/AppError'
 
 type SignOut = () => void
@@ -15,12 +16,18 @@ const api = axios.create({
 api.registerInterceptTokenManager = (signOut) => {
   const interceptTokenManager = api.interceptors.response.use(
     (response) => response,
-    (requestError) => {
+    async (requestError) => {
       if (requestError?.response?.status === 401) {
         if (
           requestError.response.data?.message === 'token.expired' ||
           requestError.response.data?.message === 'token.invalid'
         ) {
+          const { refreshToken } = await getAuthToken()
+
+          if (!refreshToken) {
+            signOut()
+            return Promise.reject(requestError)
+          }
         }
         signOut()
       }

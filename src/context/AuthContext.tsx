@@ -18,6 +18,7 @@ import { getUser, removeUser, saveUser } from '@/storage/user'
 interface AuthTokenStorageProps {
   userData: UserDTO
   token: string
+  refreshToken?: string
 }
 
 interface AuthContextProviderProps {
@@ -49,11 +50,14 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const userAndTokenSave = async ({
     userData,
     token,
+    refreshToken,
   }: AuthTokenStorageProps) => {
     setIsUserStorageDataLoading(true)
 
-    await saveUser(userData) // Salva o usuário no Async Storage para armazenamento da informação.
-    await saveAuthToken(token) // Salva o token do usuário no Async Storage.
+    if (refreshToken) {
+      await saveUser(userData) // Salva o usuário no Async Storage para armazenamento da informação.
+      await saveAuthToken({ token, refreshToken }) // Salva o token do usuário no Async Storage.
+    }
 
     setIsUserStorageDataLoading(false)
   }
@@ -63,10 +67,11 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
     const { data } = await api.post('/sessions', { email, password })
 
-    if (data.user && data.token) {
+    if (data.user && data.token && data.refreshToken) {
       await userAndTokenSave({
         userData: data.user,
         token: data.token,
+        refreshToken: data.refreshToken,
       })
       userAndTokenUpdate({
         userData: data.user,
@@ -96,7 +101,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       setIsUserStorageDataLoading(true)
 
       const userData = await getUser()
-      const token = await getAuthToken()
+      const { token } = await getAuthToken()
 
       if (userData && token) {
         userAndTokenUpdate({ userData, token })
